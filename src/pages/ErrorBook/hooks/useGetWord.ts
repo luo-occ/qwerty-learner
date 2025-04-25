@@ -4,7 +4,7 @@ import { useEffect, useMemo, useState } from 'react'
 import useSWR from 'swr'
 
 export default function useGetWord(name: string, dict: Dictionary) {
-  const { data: wordList, error, isLoading } = useSWR(dict?.url, wordListFetcher)
+  const { data: wordList, error, isLoading } = useSWR(dict?.url, (url) => wordListFetcher(url, dict.id))
   const [hasError, setHasError] = useState(false)
 
   const word: Word | undefined = useMemo(() => {

@@ -1,6 +1,31 @@
 import type { Dictionary, DictionaryResource } from '@/typings/index'
 import { calcChapterCount } from '@/utils'
 
+const customDicts: DictionaryResource[] = [
+  {
+    id: 'custom',
+    name: '自定义词库',
+    description: '自定义词库',
+    category: 'Custom',
+    tags: ['Custom'],
+    url: '/dicts/custom.json',
+    length: 0,
+    language: 'en',
+    languageCategory: 'en',
+  },
+  {
+    id: 'eudic-custom',
+    name: 'Eudic Dictionary',
+    description: 'Custom dictionary from Eudic textbooks',
+    category: 'Custom',
+    tags: ['Eudic', 'Custom'],
+    url: '/dicts/my-custom-dict.json',
+    length: 0, // This will be updated dynamically
+    language: 'en',
+    languageCategory: 'en',
+  },
+]
+
 // 中国考试
 const chinaExam: DictionaryResource[] = [
   {
@@ -4105,7 +4130,6 @@ const indonesianDicts: DictionaryResource[] = [
  * Why arrays? Because it keeps the order across browsers.
  */
 export const dictionaryResources: DictionaryResource[] = [
-  ...chinaExam,
   ...internationalExam,
   ...childrenEnglish,
   ...programming,

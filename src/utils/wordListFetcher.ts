@@ -1,9 +1,16 @@
+import { updateDictionaryLength } from './dynamicDictLength'
 import type { Word } from '@/typings'
 
-export async function wordListFetcher(url: string): Promise<Word[]> {
+export async function wordListFetcher(url: string, dictionaryId?: string): Promise<Word[]> {
   const URL_PREFIX: string = REACT_APP_DEPLOY_ENV === 'pages' ? '/qwerty-learner' : ''
 
   const response = await fetch(URL_PREFIX + url)
   const words: Word[] = await response.json()
+
+  // Update dictionary length for dynamic dictionaries
+  if (dictionaryId && dictionaryId.includes('eudic-custom')) {
+    updateDictionaryLength(dictionaryId, words)
+  }
+
   return words
 }
