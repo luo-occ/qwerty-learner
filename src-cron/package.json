@@ -6,7 +6,6 @@
   "main": "index.ts",
   "scripts": {
     "build": "tsc",
-    "remove-dicts": "ts-node remove.ts",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "dependencies": {

@@ -64,7 +64,8 @@
     "test:e2e": "playwright test",
     "lint": "eslint .",
     "prettier": "prettier --write .",
-    "prepare": "husky install"
+    "prepare": "husky install",
+    "remove-dicts": "node --loader ts-node/esm src-cron/remove.ts"
   },
   "lint-staged": {
     "src/**/*.{js,jsx,ts,tsx,json,css,scss,md}": [

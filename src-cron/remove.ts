@@ -1,18 +1,6 @@
-import {
-  //   dictionaryResources,
-  chinaExam, //   internationalExam,
-  //   childrenEnglish,
-  //   programming,
-  //   japaneseExam,
-  //   germanExam,
-  //   kazakhHapinDicts,
-  //   indonesianDicts,
-} from '../src/resources/dictionary.js'
 import { promises as fs } from 'fs'
 import path from 'path'
 import { fileURLToPath } from 'url'
-
-// Import using .js extension for ESM
 
 // Define Word interfaces
 interface DictionaryResource {
@@ -79,5 +67,3 @@ export async function deleteDictionariesForArray(
     return { count: 0, deletedFiles: [] }
   }
 }
-
-deleteDictionariesForArray(chinaExam, 'chinaExam')
