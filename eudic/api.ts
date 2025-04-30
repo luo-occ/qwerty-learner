@@ -2,22 +2,20 @@
  * Eudic API Module
  * API for interacting with Eudic vocabulary lists
  */
-
 // Load environment variables from .env.local
-require('dotenv').config({ path: '.env.local' })
+import 'dotenv/config'
 
-interface StudyListCategory {
+export interface StudyListCategory {
   id: string
   language: string
   name: string
 }
 
-interface StudyListWord {
+export interface EudicWord {
   word: string
   exp: string
   add_time: string
   star: number
-  context_line?: string
 }
 
 /**
@@ -132,7 +130,7 @@ async function deleteStudyListCategory(id: string, language: string, name: strin
  * @param page Page number (optional)
  * @param pageSize Number of words per page (optional, default 100)
  */
-async function getStudyListWords(id: string, language: string, page?: number, pageSize?: number): Promise<StudyListWord[]> {
+async function getStudyListWords(id: string, language: string, page?: number, pageSize?: number): Promise<EudicWord[]> {
   let url = `https://api.frdic.com/api/open/v1/studylist/words/${id}?language=${language}`
 
   if (page !== undefined) {
@@ -205,7 +203,7 @@ async function deleteWordsFromStudyList(id: string, language: string, words: str
   return
 }
 
-module.exports = {
+export {
   getStudyListCategories,
   addStudyListCategory,
   renameStudyListCategory,

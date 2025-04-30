@@ -1,19 +1,7 @@
+import { DictionaryResource } from './types'
 import { promises as fs } from 'fs'
 import path from 'path'
 import { fileURLToPath } from 'url'
-
-// Define Word interfaces
-interface DictionaryResource {
-  id: string
-  name: string
-  description: string
-  category?: string
-  tags?: string[]
-  url?: string
-  length?: number
-  language?: string
-  languageCategory?: string
-}
 
 // Get dirname equivalent in ESM
 const __filename = fileURLToPath(import.meta.url)
