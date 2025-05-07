@@ -1,3 +1,3 @@
-import { adaptEudicWordToJson } from './adapter'
+import { adaptEudicWordToJson } from './dictionary-api'
 
 adaptEudicWordToJson()

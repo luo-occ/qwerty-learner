@@ -1,4 +1,4 @@
-import { adaptEudicWordWithPhonetics } from './adapter.js'
+import { getPhoneticData, WordData } from './adapter.js'
 import type { EudicWord } from './api.js'
 
 // Sample words to test
@@ -33,14 +33,14 @@ async function testPhoneticData() {
   console.log('Fetching phonetic data for sample words...')
 
   try {
-    const wordsWithPhonetics = await adaptEudicWordWithPhonetics(testWords)
+    const wordsWithPhonetics = await Promise.all(testWords.map((word) => getPhoneticData(word.word)))
 
     console.log('Results:')
     console.log(JSON.stringify(wordsWithPhonetics, null, 2))
 
     console.log('\nPhonetic Symbols Summary:')
-    wordsWithPhonetics.forEach((word) => {
-      console.log(`${word.name}: US [${word.usphone}], UK [${word.ukphone}]`)
+    wordsWithPhonetics.forEach((word: WordData) => {
+      console.log(`${word.word}: US [${word.usphone}], UK [${word.ukphone}]`)
     })
   } catch (error) {
     console.error('Error during test:', error)

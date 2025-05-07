@@ -1,110 +1,95 @@
-import type { EudicWord } from './api.js'
-import type { Word } from './types.js'
-import { promises as fs } from 'fs'
-import path from 'path'
-import { fileURLToPath } from 'url'
+import fetch from 'node-fetch'
 
-const __filename = fileURLToPath(import.meta.url)
-const __dirname = path.dirname(__filename)
-
-// Type definitions for Dictionary API response
-interface Phonetic {
-  text?: string
-  audio?: string
-  sourceUrl?: string
-  license?: {
-    name: string
-    url: string
-  }
-}
-
-interface DictionaryApiResponse {
+export interface WordData {
   word: string
-  phonetics: Phonetic[]
-  meanings: any[]
-  license: any
-  sourceUrls: string[]
+  usphone: string
+  ukphone: string
+  meanings: string
 }
 
-/**
- * Fetch phonetic symbols for a word from the Free Dictionary API
- * @param word The word to get phonetic data for
- */
-async function getPhoneticData(word: string): Promise<{ usphone: string; ukphone: string }> {
+interface Phonetic {
+  text: string
+  sourceUrl?: string
+}
+
+interface Definition {
+  definition: string
+  example?: string
+}
+
+interface Meaning {
+  partOfSpeech: string
+  definitions: Definition[]
+}
+
+interface DictionaryEntry {
+  phonetics: Phonetic[]
+  meanings: Meaning[]
+}
+
+export async function getPhoneticData(word: string): Promise<WordData> {
   try {
-    const response = await fetch(`https://api.dictionaryapi.dev/api/v2/entries/en/${encodeURIComponent(word)}`)
+    const response = await fetch(`https://api.dictionaryapi.dev/api/v2/entries/en/${encodeURIComponent(word)}`, {
+      headers: {
+        Accept: 'application/json',
+        'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36',
+      },
+      timeout: 5000,
+    })
 
     if (!response.ok) {
-      return { usphone: '', ukphone: '' }
-    }
-
-    const data = (await response.json()) as DictionaryApiResponse[]
-
-    if (Array.isArray(data) && data.length > 0) {
-      // Extract phonetics
-      const phonetics = data[0].phonetics || []
-
-      // Find US pronunciation (usually no locale or 'us' locale)
-      const usPhonetic = phonetics.find((p: Phonetic) => p.audio?.includes('us.mp3') || (!p.audio?.includes('uk') && p.text))
-
-      // Find UK pronunciation
-      const ukPhonetic = phonetics.find((p: Phonetic) => p.audio?.includes('uk.mp3') || p.text)
-
-      return {
-        usphone: usPhonetic?.text || '',
-        ukphone: ukPhonetic?.text || '',
+      if (response.status === 404) {
+        throw new Error(`No definition found for word: ${word}`)
       }
+      throw new Error(`Failed to fetch data for ${word}: ${response.statusText}`)
     }
 
-    return { usphone: '', ukphone: '' }
+    const data = await response.json()
+    const firstEntry = data[0] as DictionaryEntry
+
+    // Get phonetics
+    let usphone = ''
+    let ukphone = ''
+
+    if (firstEntry.phonetics && Array.isArray(firstEntry.phonetics)) {
+      // Try to find US and UK pronunciations
+      const usPhonetic = firstEntry.phonetics.find((p: Phonetic) => p.sourceUrl?.includes('us'))
+      const ukPhonetic = firstEntry.phonetics.find((p: Phonetic) => p.sourceUrl?.includes('uk'))
+
+      usphone = usPhonetic?.text || firstEntry.phonetics[0]?.text || ''
+      ukphone = ukPhonetic?.text || firstEntry.phonetics[0]?.text || ''
+    }
+
+    // Format meanings
+    let meanings = ''
+    if (firstEntry.meanings && Array.isArray(firstEntry.meanings)) {
+      firstEntry.meanings.forEach((partOfSpeech: Meaning) => {
+        meanings += `${partOfSpeech.partOfSpeech}:\n`
+
+        if (partOfSpeech.definitions && Array.isArray(partOfSpeech.definitions)) {
+          partOfSpeech.definitions.forEach((def: Definition, index: number) => {
+            meanings += `${index + 1}. ${def.definition}\n`
+
+            if (def.example) {
+              meanings += `   Example: ${def.example}\n`
+            }
+          })
+        }
+
+        meanings += '\n'
+      })
+    }
+
+    return {
+      word,
+      usphone: usphone.replace(/[\[\]]/g, ''), // Remove brackets from phonetic notation
+      ukphone: ukphone.replace(/[\[\]]/g, ''),
+      meanings: meanings.trim(),
+    }
   } catch (error) {
-    console.error(`Error fetching phonetic data for ${word}:`, error)
-    return { usphone: '', ukphone: '' }
+    console.error(`Error fetching data for ${word}:`, error)
+    throw error
   }
 }
 
-/**
- * Enhanced adapter function with phonetic data
- */
-export async function adaptEudicWordWithPhonetics(words: EudicWord[]): Promise<Word[]> {
-  const filteredWords = filterEnglishWord(words)
-  const result: Word[] = []
-
-  for (const word of filteredWords) {
-    const { usphone, ukphone } = await getPhoneticData(word.word)
-    result.push({
-      name: word.word,
-      trans: [word.exp],
-      usphone,
-      ukphone,
-    })
-  }
-
-  return result
-}
-
-export function adaptEudicWord(word: EudicWord[]): Word[] {
-  return filterEnglishWord(word).map((w) => ({
-    name: w.word,
-    trans: [w.exp],
-    usphone: '',
-    ukphone: '',
-  }))
-}
-
-export function filterEnglishWord(words: EudicWord[]): EudicWord[] {
-  return words.filter((w) => {
-    // Check if the word contains only English letters
-    return /^[a-zA-Z]+$/.test(w.word) && w.word.length > 1
-  })
-}
-
-export async function adaptEudicWordToJson() {
-  const eudicWords = await fs.readFile(path.join(__dirname, 'dicts/archive_eudic.json'), 'utf-8')
-  const wordList = JSON.parse(eudicWords)
-
-  // Use the enhanced adapter with phonetics
-  const words = await adaptEudicWordWithPhonetics(wordList)
-
-  await fs.writeFile(path.join(__dirname, 'dicts/archive.json'), JSON.stringify(words, null, 2))
-}
+export { getPhoneticData, WordData }
