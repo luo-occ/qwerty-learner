@@ -1,4 +1,8 @@
-import fetch from 'node-fetch'
+import type { EudicWord } from './api/eudic.js'
+import type { Word } from './types.js'
+import { promises as fs } from 'fs'
+import path from 'path'
+import { fileURLToPath } from 'url'
 
 export interface WordData {
   word: string

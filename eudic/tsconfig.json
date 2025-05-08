@@ -9,5 +9,10 @@
     "forceConsistentCasingInFileNames": true,
     "outDir": "./dist"
   },
-  "include": ["./**/*"]
+  "ts-node": {
+    "esm": true,
+    "experimentalSpecifierResolution": "node"
+  },
+  "include": ["*.ts", "api/eudic.ts"],
+  "exclude": ["node_modules", "dist"]
 }
