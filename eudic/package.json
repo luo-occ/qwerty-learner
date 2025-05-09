@@ -8,7 +8,8 @@
   "scripts": {
     "dev": "node --loader ts-node/esm index.ts",
     "build": "tsc",
-    "test-phonetics": "node --loader ts-node/esm test-phonetics.ts"
+    "test-phonetics": "node --loader ts-node/esm test-phonetics.ts",
+    "test": "node --loader ts-node/esm test.ts"
   },
   "dependencies": {
     "axios": "^1.6.0",
