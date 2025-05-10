@@ -2,6 +2,10 @@ import { getPhoneticData } from '../eudic/api/phonetics.js'
 import type { Word } from '../eudic/types.js'
 import fs from 'fs'
 import path from 'path'
+import { fileURLToPath } from 'url'
+
+const __filename = fileURLToPath(import.meta.url)
+const __dirname = path.dirname(__filename)
 
 async function processWords() {
   try {
@@ -31,7 +35,7 @@ async function processWords() {
     }
 
     // Save results
-    const outputPath = path.join(outputDir, 'eudic_phonetic.json')
+    const outputPath = path.join(outputDir, 'Eudic_phonetic.json')
     fs.writeFileSync(outputPath, JSON.stringify(results, null, 2))
     console.log(`Results saved to ${outputPath}`)
   } catch (error) {
