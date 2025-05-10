@@ -1,5 +1,4 @@
 import type { Word } from '../types.js'
-import type { EudicWord } from './eudic.js'
 
 interface Phonetic {
   text: string

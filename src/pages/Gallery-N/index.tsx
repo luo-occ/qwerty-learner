@@ -45,7 +45,6 @@ export default function GalleryPage() {
       groupedByCategoryAndTag,
     }
   }, [galleryState.currentLanguageTab])
-
   const onBack = useCallback(() => {
     navigate('/')
   }, [navigate])

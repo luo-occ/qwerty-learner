@@ -9,9 +9,10 @@ import { Tabs, TabsContent } from '@/components/ui/tabs'
 import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group'
 import { currentChapterAtom, currentDictIdAtom, reviewModeInfoAtom } from '@/store'
 import type { Dictionary } from '@/typings'
+import { calcChapterCount } from '@/utils'
 import range from '@/utils/range'
 import { useAtom, useSetAtom } from 'jotai'
-import { useCallback, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import IcOutlineCollectionsBookmark from '~icons/ic/outline-collections-bookmark'
 import MajesticonsPaperFoldTextLine from '~icons/majesticons/paper-fold-text-line'
@@ -46,6 +47,10 @@ export default function DictDetail({ dictionary: dict }: { dictionary: Dictionar
     },
     [deleteWordRecord, dict.id],
   )
+
+  useEffect(() => {
+    dict.chapterCount = calcChapterCount(dict.length)
+  }, [dict.length])
 
   const onChangeChapter = useCallback(
     (index: number) => {

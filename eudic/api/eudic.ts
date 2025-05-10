@@ -38,6 +38,7 @@ function createHeaders(contentType = false): HeadersInit {
  * @param language Language code (en/fr/de/es)
  */
 async function getStudyListCategories(language: string): Promise<StudyListCategory[]> {
+  console.log('headers', createHeaders())
   const response = await fetch(`https://api.frdic.com/api/open/v1/studylist/category?language=${language}`, {
     method: 'GET',
     headers: createHeaders(),

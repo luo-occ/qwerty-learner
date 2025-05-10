@@ -1,5 +1,4 @@
-import { getPhoneticData } from './api/phonetics.js'
+import { getStudyListCategories } from './api/eudic.js'
 
-const data = await getPhoneticData('hello')
-
+const data = await getStudyListCategories('en')
 console.log(data)
