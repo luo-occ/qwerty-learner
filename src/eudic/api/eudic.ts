@@ -3,7 +3,6 @@
  * API for interacting with Eudic vocabulary lists
  */
 // Load environment variables from .env.local
-import 'dotenv/config'
 
 export interface StudyListCategory {
   id: string
@@ -23,7 +22,7 @@ export interface EudicWord {
  */
 function createHeaders(contentType = false): HeadersInit {
   const headers: HeadersInit = {
-    Authorization: process.env.EUDIC_AUTH_TOKEN || '',
+    Authorization: EUDIC_AUTH_TOKEN || '',
   }
 
   if (contentType) {
@@ -33,12 +32,13 @@ function createHeaders(contentType = false): HeadersInit {
   return headers
 }
 
+const EUDIC_LIST_ID = '0'
+
 /**
  * Get all vocabulary lists
  * @param language Language code (en/fr/de/es)
  */
 async function getStudyListCategories(language: string): Promise<StudyListCategory[]> {
-  console.log('headers', createHeaders())
   const response = await fetch(`https://api.frdic.com/api/open/v1/studylist/category?language=${language}`, {
     method: 'GET',
     headers: createHeaders(),
@@ -131,7 +131,9 @@ async function deleteStudyListCategory(id: string, language: string, name: strin
  * @param page Page number (optional)
  * @param pageSize Number of words per page (optional, default 100)
  */
-async function getStudyListWords(id: string, language: string, page?: number, pageSize?: number): Promise<EudicWord[]> {
+async function getStudyListWords(page?: number, pageSize?: number): Promise<EudicWord[]> {
+  const id = EUDIC_LIST_ID
+  const language = 'en'
   let url = `https://api.frdic.com/api/open/v1/studylist/words/${id}?language=${language}`
 
   if (page !== undefined) {
@@ -141,7 +143,7 @@ async function getStudyListWords(id: string, language: string, page?: number, pa
   if (pageSize !== undefined) {
     url += `&page_size=${pageSize}`
   }
-
+  console.log('headers', createHeaders())
   const response = await fetch(url, {
     method: 'GET',
     headers: createHeaders(),
@@ -186,7 +188,9 @@ async function addWordsToStudyList(id: string, language: string, words: string[]
  * @param language Language code (en/fr/de/es)
  * @param words Array of words to delete
  */
-async function deleteWordsFromStudyList(id: string, language: string, words: string[]): Promise<void> {
+async function deleteWordsFromStudyList(words: string[]): Promise<void> {
+  const id = EUDIC_LIST_ID
+  const language = 'en'
   const response = await fetch('https://api.frdic.com/api/open/v1/studylist/words', {
     method: 'DELETE',
     headers: createHeaders(true),

@@ -12,6 +12,7 @@ import { WordPronunciationIcon } from '@/components/WordPronunciationIcon'
 import { EXPLICIT_SPACE } from '@/constants'
 import useKeySounds from '@/hooks/useKeySounds'
 import { TypingContext, TypingStateActionType } from '@/pages/Typing/store'
+import { dictStore } from '@/resources/dictionary'
 import {
   currentChapterAtom,
   currentDictInfoAtom,
@@ -25,6 +26,7 @@ import type { Word } from '@/typings'
 import { CTRL, getUtcStringForMixpanel, useMixPanelWordLogUploader } from '@/utils'
 import { useSaveWordRecord } from '@/utils/db'
 import { useAtomValue } from 'jotai'
+import { TrashIcon } from 'lucide-react'
 import { useCallback, useContext, useEffect, useRef, useState } from 'react'
 import { useHotkeys } from 'react-hotkeys-hook'
 import { useImmer } from 'use-immer'
@@ -310,6 +312,15 @@ export default function WordComponent({ word, onFinish }: { word: Word; onFinish
               </Tooltip>
             </div>
           )}
+          {/* support delete word */}
+          <button
+            className="absolute -right-24 top-1/2 h-7 w-7 -translate-y-[45%] transform opacity-0 hover:opacity-100"
+            onClick={() => {
+              dictStore.deleteWords([word.name])
+            }}
+          >
+            <TrashIcon className="h-full w-full text-gray-600" />
+          </button>
         </div>
       </div>
       <TipAlert className="fixed bottom-10 right-3" show={showTipAlert} setShow={setShowTipAlert} />

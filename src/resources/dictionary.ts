@@ -1,7 +1,9 @@
-import type { Dictionary, DictionaryResource } from '@/typings/index'
+import { deleteWords, refreshDict, updateEudicDict } from '@/eudic'
+import { dictDB } from '@/eudic/db'
+import type { Dictionary, Word } from '@/typings/index'
 import { calcChapterCount } from '@/utils'
 
-const customDicts: DictionaryResource[] = [
+const customDicts: Dictionary[] = [
   {
     id: 'eudic-custom',
     name: 'Eudic Dictionary',
@@ -12,9 +14,10 @@ const customDicts: DictionaryResource[] = [
     length: 5000, // TODO: update length
     language: 'en',
     languageCategory: 'en',
+    chapterCount: 250,
   },
 ]
-const chinaExam: DictionaryResource[] = [
+const chinaExam: Dictionary[] = [
   {
     id: 'cet4',
     name: 'CET-4',
@@ -25,47 +28,43 @@ const chinaExam: DictionaryResource[] = [
     length: 2607,
     language: 'en',
     languageCategory: 'en',
+    chapterCount: 14,
   },
 ]
 
-// 国际考试
-const internationalExam: DictionaryResource[] = [
-  {
-    id: 'bec2',
-    name: '商务英语',
-    description: '商务英语常见词',
-    category: '国际考试',
-    tags: ['BEC'],
-    url: '/dicts/BEC_2_T.json',
-    length: 2753,
-    language: 'en',
-    languageCategory: 'en',
-  },
-  {
-    id: 'bec3',
-    name: 'BEC',
-    description: 'BEC考试常见词',
-    category: '国际考试',
-    tags: ['BEC'],
-    url: '/dicts/BEC_3_T.json',
-    length: 2825,
-    language: 'en',
-    languageCategory: 'en',
-  },
-]
+class DictStore {
+  public idDictionaryMap: Record<string, Dictionary> = Object.fromEntries([...customDicts, ...chinaExam].map((dict) => [dict.id, dict]))
+  private updateEudicDict: Promise<Word[]> = updateEudicDict()
+  private db = dictDB
+  constructor() {
+    this.updateEudicDict.then((words) => {
+      const eudicDict = this.idDictionaryMap['eudic-custom']
+      eudicDict.length = words.length
+      eudicDict.chapterCount = calcChapterCount(words.length)
+    })
+  }
+  get dictionaries() {
+    return Object.values(this.idDictionaryMap)
+  }
+  async fetchWordList(url: string, dictionaryId?: string): Promise<Word[]> {
+    console.log('Fetching word list...')
+    if (url === '/dicts/Eudic.json') {
+      return this.updateEudicDict
+    }
+    const URL_PREFIX: string = REACT_APP_DEPLOY_ENV === 'pages' ? '/qwerty-learner' : ''
+    const response = await fetch(URL_PREFIX + url)
+    const words: Word[] = await response.json()
 
-/**
- * Built-in dictionaries in an array.
- * Why arrays? Because it keeps the order across browsers.
- */
-export const dictionaryResources: DictionaryResource[] = [...customDicts, ...internationalExam, ...chinaExam]
+    return words
+  }
 
-export const dictionaries: Dictionary[] = dictionaryResources.map((resource) => ({
-  ...resource,
-  chapterCount: calcChapterCount(resource.length),
-}))
+  async refreshDict() {
+    refreshDict()
+  }
+  async deleteWords(names: string[]) {
+    deleteWords(names)
+  }
+}
 
-/**
- * An object-map from dictionary IDs to dictionary themselves.
- */
-export const idDictionaryMap: Record<string, Dictionary> = Object.fromEntries(dictionaries.map((dict) => [dict.id, dict]))
+export const dictStore = new DictStore()
+window.dictStore = dictStore

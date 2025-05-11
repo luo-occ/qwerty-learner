@@ -6,7 +6,7 @@ import jotaiReactRefresh from 'jotai/babel/plugin-react-refresh'
 import path from 'node:path'
 import { visualizer } from 'rollup-plugin-visualizer'
 import Icons from 'unplugin-icons/vite'
-import { defineConfig } from 'vite'
+import { defineConfig, loadEnv } from 'vite'
 import type { PluginOption } from 'vite'
 
 // https://vitejs.dev/config/
@@ -14,6 +14,7 @@ export default defineConfig(async ({ mode }) => {
   const latestCommitHash = await new Promise<string>((resolve) => {
     return getLastCommit((err, commit) => (err ? 'unknown' : resolve(commit.shortHash)))
   })
+  const env = loadEnv(mode, process.cwd(), '')
   return {
     plugins: [
       react({ babel: { plugins: [jotaiDebugLabel, jotaiReactRefresh] } }),
@@ -37,6 +38,7 @@ export default defineConfig(async ({ mode }) => {
       drop: mode === 'development' ? [] : ['console', 'debugger'],
     },
     define: {
+      EUDIC_AUTH_TOKEN: JSON.stringify(env.EUDIC_AUTH_TOKEN),
       REACT_APP_DEPLOY_ENV: JSON.stringify(process.env.REACT_APP_DEPLOY_ENV),
       LATEST_COMMIT_HASH: JSON.stringify(latestCommitHash + (process.env.NODE_ENV === 'production' ? '' : ' (dev)')),
     },

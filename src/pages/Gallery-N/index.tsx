@@ -2,7 +2,7 @@ import DictionaryGroup from './CategoryDicts'
 import DictRequest from './DictRequest'
 import { LanguageTabSwitcher } from './LanguageTabSwitcher'
 import Layout from '@/components/Layout'
-import { dictionaries } from '@/resources/dictionary'
+import { dictStore } from '@/resources/dictionary'
 import { currentDictInfoAtom } from '@/store'
 import type { Dictionary, LanguageCategoryType } from '@/typings'
 import groupBy, { groupByDictTags } from '@/utils/groupBy'
@@ -35,7 +35,7 @@ export default function GalleryPage() {
   const currentDictInfo = useAtomValue(currentDictInfoAtom)
 
   const { groupedByCategoryAndTag } = useMemo(() => {
-    const currentLanguageCategoryDicts = dictionaries.filter((dict) => dict.languageCategory === galleryState.currentLanguageTab)
+    const currentLanguageCategoryDicts = dictStore.dictionaries.filter((dict) => dict.languageCategory === galleryState.currentLanguageTab)
     const groupedByCategory = Object.entries(groupBy(currentLanguageCategoryDicts, (dict) => dict.category))
     const groupedByCategoryAndTag = groupedByCategory.map(
       ([category, dicts]) => [category, groupByDictTags(dicts)] as [string, Record<string, Dictionary[]>],

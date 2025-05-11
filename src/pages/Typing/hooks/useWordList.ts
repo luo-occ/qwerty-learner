@@ -1,7 +1,7 @@
 import { CHAPTER_LENGTH } from '@/constants'
+import { dictStore } from '@/resources/dictionary'
 import { currentChapterAtom, currentDictInfoAtom, reviewModeInfoAtom } from '@/store'
 import type { Word, WordWithIndex } from '@/typings/index'
-import { wordListFetcher } from '@/utils/wordListFetcher'
 import { useAtom, useAtomValue } from 'jotai'
 import { useMemo } from 'react'
 import useSWR from 'swr'
@@ -26,7 +26,7 @@ export function useWordList(): UseWordListResult {
   }
 
   const isFirstChapter = !isReviewMode && currentDictInfo.id === 'cet4' && currentChapter === 0
-  const { data: wordList, error, isLoading } = useSWR(currentDictInfo.url, (url) => wordListFetcher(url, currentDictInfo.id))
+  const { data: wordList, error, isLoading } = useSWR(currentDictInfo.url, (url) => dictStore.fetchWordList(url, currentDictInfo.id))
 
   const words: WordWithIndex[] = useMemo(() => {
     let newWords: Word[]

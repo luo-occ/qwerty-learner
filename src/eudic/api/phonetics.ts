@@ -1,4 +1,5 @@
-import type { Word } from '../types.js'
+import type { Word } from '../types.ts'
+import type { EudicWord } from './eudic.ts'
 
 interface Phonetic {
   text: string
@@ -20,9 +21,9 @@ interface DictionaryEntry {
   meanings: Meaning[]
 }
 
-export async function getPhoneticData(word: string): Promise<Word> {
+export async function getPhoneticData(word: EudicWord): Promise<Word> {
   try {
-    const response = await fetch(`https://api.dictionaryapi.dev/api/v2/entries/en/${encodeURIComponent(word)}`)
+    const response = await fetch(`https://api.dictionaryapi.dev/api/v2/entries/en/${encodeURIComponent(word.word)}`)
 
     if (!response.ok) {
       if (response.status === 404) {
@@ -48,7 +49,7 @@ export async function getPhoneticData(word: string): Promise<Word> {
     }
 
     // Format meanings
-    let meanings: string[] = []
+    const meanings: string[] = []
     if (firstEntry.meanings && Array.isArray(firstEntry.meanings)) {
       firstEntry.meanings.forEach((partOfSpeech: Meaning) => {
         meanings.push(`${partOfSpeech.partOfSpeech}:\n`)
@@ -66,13 +67,22 @@ export async function getPhoneticData(word: string): Promise<Word> {
     }
 
     return {
-      name: word,
+      name: word.word,
       trans: meanings,
       usphone: usphone.replace(/[\[\]]/g, ''), // Remove brackets from phonetic notation
       ukphone: ukphone.replace(/[\[\]]/g, ''),
     }
   } catch (error) {
     console.error(`Error fetching data for ${word}:`, error)
-    throw error
+    return eudicToDict(word)
+  }
+}
+
+function eudicToDict(eudicWord: EudicWord): Word {
+  return {
+    name: eudicWord.word,
+    trans: eudicWord.exp.split(';'),
+    usphone: '',
+    ukphone: '',
   }
 }

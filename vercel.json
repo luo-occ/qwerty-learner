@@ -14,11 +14,5 @@
       "src": "/(.*)",
       "dest": "/$1"
     }
-  ],
-  "crons": [
-    {
-      "path": "/api/run-eudic-script",
-      "schedule": "0 0 * * *"
-    }
   ]
 }
