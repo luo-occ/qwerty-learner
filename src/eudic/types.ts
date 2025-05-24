@@ -4,6 +4,7 @@ export interface Word {
   usphone: string
   ukphone: string
   notation?: string
+  add_time?: string
 }
 
 export interface DictionaryResource {

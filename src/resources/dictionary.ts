@@ -38,6 +38,7 @@ class DictStore {
   private db = dictDB
   constructor() {
     this.updateEudicDict.then((words) => {
+      console.log('updatedEudicDict', words)
       const eudicDict = this.idDictionaryMap['eudic-custom']
       eudicDict.length = words.length
       eudicDict.chapterCount = calcChapterCount(words.length)
@@ -46,8 +47,7 @@ class DictStore {
   get dictionaries() {
     return Object.values(this.idDictionaryMap)
   }
-  async fetchWordList(url: string, dictionaryId?: string): Promise<Word[]> {
-    console.log('Fetching word list...')
+  async fetchWordList(url: string): Promise<Word[]> {
     if (url === '/dicts/Eudic.json') {
       return this.updateEudicDict
     }

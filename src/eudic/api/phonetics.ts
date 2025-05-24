@@ -69,8 +69,9 @@ export async function getPhoneticData(word: EudicWord): Promise<Word> {
     return {
       name: word.word,
       trans: meanings,
-      usphone: usphone.replace(/[\[\]]/g, ''), // Remove brackets from phonetic notation
-      ukphone: ukphone.replace(/[\[\]]/g, ''),
+      add_time: word.add_time,
+      usphone, // Remove brackets from phonetic notation
+      ukphone,
     }
   } catch (error) {
     console.error(`Error fetching data for ${word}:`, error)
@@ -82,6 +83,7 @@ function eudicToDict(eudicWord: EudicWord): Word {
   return {
     name: eudicWord.word,
     trans: eudicWord.exp.split(';'),
+    add_time: eudicWord.add_time,
     usphone: '',
     ukphone: '',
   }

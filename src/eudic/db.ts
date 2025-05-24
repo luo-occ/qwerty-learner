@@ -8,10 +8,32 @@ class DictDB extends Dexie {
 
   constructor() {
     super('DictDB')
+
     this.version(1).stores({
-      //   eudicDicts: '&word,exp,add_time,star',
-      dicts: '&name,trans,usphone,ukphone,notation',
+      dicts: '&name,trans,usphone,ukphone,notation,*add_time',
     })
+  }
+  getTimedDicts() {
+    return this.dicts.orderBy('add_time').reverse().toArray()
+  }
+
+  async clean() {
+    try {
+      // Close the current database connection
+      await this.close()
+
+      // Delete the database
+      await this.delete()
+
+      // Reopen the database
+      await this.open()
+
+      console.log('Database cleaned successfully')
+      return true
+    } catch (error) {
+      console.error('Error cleaning database:', error)
+      return false
+    }
   }
 }
 

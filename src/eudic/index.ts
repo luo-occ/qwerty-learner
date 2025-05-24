@@ -4,18 +4,18 @@ import { processWords } from './update'
 import type { Word } from '@/typings'
 
 export async function updateEudicDict(): Promise<Word[]> {
+  console.log('Updating Eudic dictionary...')
   const updateDate = localStorage.getItem('dictStoreUpdateDate')
-  if (!updateDate || updateDate !== new Date().toISOString().split('T')[0]) {
-    console.log('Updating Eudic dictionary...')
+  if (!updateDate || new Date().getTime() - new Date(updateDate).getTime() > 1000 * 60 * 5) {
     await processWords()
-    localStorage.setItem('dictStoreUpdateDate', new Date().toISOString().split('T')[0])
+    localStorage.setItem('dictStoreUpdateDate', new Date().toISOString())
   }
-  return dictDB.dicts.toArray()
+  return dictDB.getTimedDicts()
 }
 
 export async function refreshDict() {
   localStorage.removeItem('dictStoreUpdateDate')
-  await dictDB.dicts.clear()
+  await dictDB.clean()
   await updateEudicDict()
 }
 
