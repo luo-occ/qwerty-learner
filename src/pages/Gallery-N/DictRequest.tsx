@@ -1,4 +1,5 @@
 import InfoPanel from '@/components/InfoPanel'
+import { dictStore } from '@/resources/dictionary'
 import { useCallback, useState } from 'react'
 import IconBook2 from '~icons/tabler/book-2'
 
@@ -11,6 +12,10 @@ export default function DictRequest() {
 
   const onClosePanel = useCallback(() => {
     setShowPanel(false)
+  }, [])
+
+  const onRefreshDict = useCallback(() => {
+    dictStore.refreshDict()
   }, [])
 
   return (
@@ -46,9 +51,12 @@ export default function DictRequest() {
           <br />
         </InfoPanel>
       )}
-      <button className="cursor-pointer pr-6 text-sm text-indigo-500" onClick={onOpenPanel}>
-        没有找到想要的词典？
+      <button className="cursor-pointer pr-6 text-sm text-indigo-500" onClick={onRefreshDict}>
+        refresh your dictionary
       </button>
+      {/* <button className="cursor-pointer pr-6 text-sm text-indigo-500" onClick={onOpenPanel}>
+        没有找到想要的词典？
+      </button> */}
     </>
   )
 }
